@@ -36,7 +36,9 @@ export default function BordlePage() {
             </i>
             <img
               className="py-2"
-              src={"/app_img.png"}
+              src={
+                "https://github.com/codeyoufools/bordle/raw/master/app_img.png"
+              }
               alt="Image of the app."
               width={200}
               height={300}

@@ -15,12 +15,11 @@ export default function TypescriptInterpreterPage() {
             in typescript. It meant to be a full REPL of a made up language I
             create along the way. Right now the language is very similar to
             javascript as the focus was on learning the steps of creating an
-            interpreter. Currently the lexer is mostly done and easily
-            extendable. The groundwork is also laid down for the parser with
-            parsers for functions, expressions, variable definitions already
-            implemented. Next step is writing an evaluator that makes the
-            program run. For now the program reads code from a console program
-            and prints out the language AST.
+            interpreter. The interpreter currently lexes, parses and evaluates
+            some basic statements and can work with numbers, strings and
+            booleans. Its far from a complete language but you can do some
+            simple things like calculate the Fibonacci sequence. Feel free to
+            try it down below.
           </p>
           <h1 className="text-xl font-semibold py-4">Technologies:</h1>
           <p className="text-md">

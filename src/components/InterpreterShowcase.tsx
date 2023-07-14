@@ -1,54 +1,66 @@
 "use client";
+import { builtinScope } from "@/interpreter/typescript_interpreter/builtinScope";
+import { Evaluator } from "@/interpreter/typescript_interpreter/evaluator";
 import { Lexer } from "@/interpreter/typescript_interpreter/lexer";
 import { Parser } from "@/interpreter/typescript_interpreter/parser";
 import { useState } from "react";
 
 const parser = new Parser();
 const lexer = new Lexer();
-function getPromptResponse(prompt: string) {
-  let res = undefined;
-  try {
-    res = parser.loadTokens(lexer.loadString(prompt).lex()).parse();
-  } catch (e: any) {
-    return e.message;
-  }
-  return res;
-}
+const evaluator = new Evaluator();
+
 export default function InterpreterShowcase() {
-  const [interpreterOutput, setInterpreterOutput] = useState<any>(null);
+  const [interpreterOutput, setInterpreterOutput] = useState<any>();
+  const [interpreterInput, setIntepreterInput] =
+    useState(`  function fib(value){
+      if(value<2){return value;}
+      return fib(value-1)+fib(value-2);
+  }
+  function factorial(value){
+    if(value==0 || value==1){return value;}
+    return value*factorial(value-1);
+  }
+  let smallFib = fib(10);
+  let bigFib = fib(20);
+  let fact=factorial(20);
+  return '20! Factorial is equal to:'+fact+' ,bigFib is equal to:'+bigFib+' and smallFib is: '+smallFib;
+  `);
+  console.log(interpreterOutput);
   return (
     <div className="max-w-full">
-      <div className="max-h-[20rem] overflow-y-auto bg-zinc-200 dark:bg-zinc-800 rounded ">
-        <pre className="text-sm p-4 max-w-full">
-          {JSON.stringify(
-            interpreterOutput ??
-              "Write some input to see the generated AST show up here.",
-            null,
-            2
-          )}
-        </pre>
+      <div className="max-h-[20rem] h-[20rem] overflow-y-auto border-1 border-blue-500 border rounded min-h-full flex ">
+        <textarea
+          defaultValue={interpreterInput}
+          className="text p-4 w-[50%] h-full"
+        ></textarea>
+        <div className="w-[50%] h-full py-8 px-2 border-l border-blue-500">
+          <p>
+            {interpreterOutput
+              ? ">> Process returned: " + interpreterOutput
+              : ""}
+          </p>
+        </div>
       </div>
-      <form
-        className="py-6 w-full flex space-x-2"
-        onSubmit={(e) => {
-          e.preventDefault();
-          const formData = new FormData(e.currentTarget);
-          const prompt = formData.get("prompt");
-          const response = getPromptResponse(prompt as string);
-          console.log(response);
-          setInterpreterOutput(response);
+
+      <button
+        onClick={() => {
+          const input = document.querySelector("textarea")?.value;
+          if (input) {
+            setIntepreterInput(input);
+            try {
+              const res = evaluator.evaluateProgram(
+                parser.loadTokens(lexer.loadString(input).lex()).parse()
+              );
+              setInterpreterOutput(res as any);
+            } catch (e) {
+              setInterpreterOutput(e);
+            }
+          }
         }}
+        className="px-4 py-2 bg-blue-500 text-white"
       >
-        <label className="pr-4 text-base">Input:</label>
-        <input
-          className="grow text-black text-base rounded-sm px-4 py-2 w-full  outline outline-2 focus:outline-blue-700"
-          type="text"
-          name="prompt"
-          placeholder="Input some syntax"
-          defaultValue={"let a=1;"}
-        />
-        <button className="px-4 py-2 bg-blue-500 text-white">Run!</button>
-      </form>
+        Run!
+      </button>
     </div>
   );
 }
